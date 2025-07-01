@@ -1,0 +1,129 @@
+# Dummies (por efecto)
+
+$Efecto = \mu_j - \mu$
+
+$\mu = \overline{y}$
+
+$\mu_j = \overline{y_{(j)}}$
+
+$y_{(j)} = y \cdot 1_{c_j}$
+
+Donde $1_{c_j}$ indica si el dato pertenece a la categoría $j$.
+
+El efecto se basa en determinar si la media de la categoría (la media de las respuestas cuando es esa categoría) es **diferente** a la media global (la media de todas las respuestas), explicando así un efecto fuerte o débil para esa categoría, esto nos ayudará a agrupar las categorías de efecto fuerte y de efecto débil (ya sea positivo o negativo) y discriminar quién será la base cero que no explique una diferencia hacia media global (categoría sin efecto). 
+
+La base cero siempre debería tener más muestras que las activaciones
+Las activaciones deberían mostrar un efecto diferente a la base cero
+Contradecir a la mayoría (efecto).
+
+workclass
+--------------------------------------
+x1 = Never-worked | Without-pay
+x2 = Self-emp-inc
+x3 = Federal-gov
+x4 = Local-gov | Self-emp-not-inc | State-gov
+x5 = ?
+
+base >>>  Private
+
+education
+--------------------------------------
+x6 = Doctorate | Prof-school 
+x7 = Masters | Bachelors
+x8 = Preeschool | 1st-4th | 5th-6th
+x9 = 7th-8th | 9th | 10th | 11th | 12th
+
+base >>> Hs-grad | Some-college | Assoc-voc | Assoc-acdm
+
+marital-status
+--------------------------------------
+x10 = Married-AF-spouse | Married-civ-spouse
+
+base >>> Windowed | Separated | Divorced | Never-married
+
+occupation
+--------------------------------------
+
+x11 = Priv-house-serv | Other-service | Handlers-cleaners
+x12 = Prof-specialty | Excec-managerial
+x13 = Protectiv-serv | Tech-support | Sales
+
+base >>> Armed-Forces | ? | Farm-fishing | Transport-moving | Craft-repair | Adm-clerical
+
+relationship
+--------------------------------------
+x14 = Wife | Husband
+
+base >>> Other-relative | Unmarried | Own-child | Not-in-family
+
+race
+--------------------------------------
+
+x15 = Other | Amer-Indian-Eskimo | Black
+
+base >>> White | Asian-Pac-Islander
+
+sex
+--------------------------------------
+
+x16 = Female
+
+base >>> Male
+
+native-country
+--------------------------------------
+
+      12, 26, 3, 21, 29, 30, 17
+x17 = Iran | France | India | Taiwan | Japan | Yugoslavia | Cambodia
+
+      14, 9, 10, 11, 13, 38
+x18 = Italy | England | Canada | Germany | Philippines | Hong
+
+      18, 19, 2, 20, 23, 34, 7, 22
+x19 = Thailand | Ecuador | Jamaica | Laos | Portugal | Trinadad | Puerto | Haiti
+
+      25, 8, 37, 31, 36, 5, 27
+x20 = El-Salvador | Honduras | Vietnam | Peru | Nicaragua | Mexico | Guatemala
+
+      16, 24, 32, 41
+x21 = Columbia | Dominican-Republic | Outlying-US(Guam-USVI-etc) | Holand-Netherlands
+
+
+base >>> Greece | China | Cuba | ? | Scotland | United-States | Hungary |Ireland | South | Poland
+
+# Continuas (real o entero)
+
+x22 = age *
+x23 = fnlwgt **
+x24 = education-num •
+x25 = capital-gain **
+x26 = capital-loss ***
+x27 = hours-per-week ••• ***
+
+Discreta: Numérica pero finita => categoría (cualitativa ordinal)
+
+# Tipología
+
+Continuas (Cuantitativas)
+- real
+- enteros (quasi-infinitos o grandes)
+
+Categóricas (Cualitativos)
+- ordinal
+    - enteros (finitos y pequeños) [discretos / grupos] {one-hot -> binaria}
+- nominal
+    - binaria
+    - multiclase {one-hot -> binaria}
+
+Categóricos -> Binarización | Continuidarización
+
+quasi - casi
+pseudo - derivado
+
+# Winzorizado
+
+x = pandas.Series([-100, -3, -2, -1, 0, 1, 2, 3, 100])
+
+winzorizado(x)
+
+-2 - 1.5 * 4, 2 + 1.5 * 4
