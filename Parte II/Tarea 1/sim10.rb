@@ -58,7 +58,7 @@ curve1.draw
 curve2.draw
 
 update do
-  $t0 += 0.001
+  $t0 += 0.01
   $t1 = $t0 + $c
 
   if $t0 > 3

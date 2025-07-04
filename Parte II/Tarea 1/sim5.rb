@@ -94,7 +94,6 @@ class CurveBox
   end
 end
 
-# Crear instancia pasando la función como lambda
 curve1 = CurveBox.new(
   ox: 100,
   oy: 100,
