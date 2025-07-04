@@ -6,7 +6,7 @@ $h = 400
 
 set width: $w
 set height: $h
-set title: 'Simulación 8 - Impulso con Perceptrón'
+set title: 'Simulación 10 - Dinámica diferencial'
 
 $t0 = -3
 $c = 1
@@ -28,12 +28,18 @@ curve1 = CurveBox.new(
   f: method(:impulso)
 )
 
-$b0 = 0
-$b1 = 1
+# dv/dt = -a v + b * impulso(t)
+# v(t + λt) = v(t) + λt * (-a v(t) + b * impulso(t))
 
-def perceptron(t)
-  y = 1 / (1 + Math.exp(-($b0 + $b1 * t)))
-  y
+
+$v = 0.0   # Estado inicial
+$a = 1.0   # Decaimiento
+$b = 2.0   # Peso del impulso
+$dt = 0.05 # Paso temporal
+
+def dinamica(t)
+  $v += $dt * (-$a * $v + $b * impulso(t))
+  $v
 end
 
 curve2 = CurveBox.new(
@@ -45,14 +51,14 @@ curve2 = CurveBox.new(
   tmax: 3,
   ymin: -1.5,
   ymax: 1.5,
-  f: method(:perceptron)
+  f: method(:dinamica)
 )
 
 curve1.draw
 curve2.draw
 
 update do
-  $t0 += 0.01
+  $t0 += 0.001
   $t1 = $t0 + $c
 
   if $t0 > 3

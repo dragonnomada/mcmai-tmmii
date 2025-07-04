@@ -6,7 +6,7 @@ $h = 400
 
 set width: $w
 set height: $h
-set title: 'Simulación 8 - Impulso con Perceptrón'
+set title: 'Simulación 9 - Dinámica del Perceptrón'
 
 $t0 = -3
 $c = 1
@@ -32,7 +32,8 @@ $b0 = 0
 $b1 = 1
 
 def perceptron(t)
-  y = 1 / (1 + Math.exp(-($b0 + $b1 * t)))
+  u = impulso(t)
+  y = 1 / (1 + Math.exp(-($b0 + $b1 * t))) * u
   y
 end
 
