@@ -34,8 +34,9 @@ class CurveBox
 
     points = []
 
-    (-180..180).step(5) do |deg|
-      t = deg * Math::PI / 180
+    d = (@tmax - @tmin) / 200.0
+
+    (@tmin..@tmax).step(d) do |t|
       x = @ox + (t - @tmin) / (@tmax - @tmin) * @sx
       y = @oy + @sy - (@f.call(t) - @ymin) / (@ymax - @ymin) * @sy
 
@@ -48,33 +49,53 @@ class CurveBox
     end
 
     points.each_cons(2) do |(x1, y1), (x2, y2)|
+      yc = (y1 + y2) / 2.0
+
       @lines << Line.new(
         x1: x1,
         y1: y1,
         x2: x2,
         y2: y2,
         width: 2,
-        color: [0.5, 1 - y1 / (@sy / 2), 0.5, 1]  # Nota: 400 era $h
+        color: [0.5, 1 - (yc - @ymin) / (@ymax - @ymin), 0.5, 1]  # Nota: 400 era $h
       )
     end
   end
 
   def draw_axes
+    # @lines << Line.new(
+    #   x1: @ox,
+    #   y1: @oy + (@sy / 2),
+    #   x2: @ox + @sx,
+    #   y2: @oy + (@sy / 2),
+    #   width: 1,
+    #   color: 'gray'
+    # )
+    # @lines << Line.new(
+    #   x1: @ox + (@sx / 2),
+    #   y1: @oy,
+    #   x2: @ox + (@sx / 2),
+    #   y2: @oy + @sy,
+    #   width: 1,
+    #   color: 'gray'
+    # )
+    x0 = @ox + (0.0 - @tmin) / (@tmax - @tmin) * @sx
+    y0 = @oy + @sy - (0.0 - @ymin) / (@ymax - @ymin) * @sy
     @lines << Line.new(
       x1: @ox,
-      y1: @oy + (@sy / 2),
+      y1: y0,
       x2: @ox + @sx,
-      y2: @oy + (@sy / 2),
+      y2: y0,
       width: 1,
-      color: 'gray'
+      color: 'yellow'
     )
     @lines << Line.new(
-      x1: @ox + (@sx / 2),
+      x1: x0,
       y1: @oy,
-      x2: @ox + (@sx / 2),
+      x2: x0,
       y2: @oy + @sy,
       width: 1,
-      color: 'gray'
+      color: 'yellow'
     )
   end
 
