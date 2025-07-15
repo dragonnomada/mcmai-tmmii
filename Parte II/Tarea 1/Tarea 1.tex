@@ -626,73 +626,168 @@ A continuación se deja el código del simulador desarrollado.
 
 \FunctionTok{require} \VerbatimStringTok{\textquotesingle{}ruby2d\textquotesingle{}}
 \FunctionTok{require\_relative} \VerbatimStringTok{\textquotesingle{}curve\_box\textquotesingle{}}
+\FunctionTok{require\_relative} \VerbatimStringTok{\textquotesingle{}point\_box\textquotesingle{}}
 
-\VariableTok{$w} \OperatorTok{=} \DecValTok{800}
-\VariableTok{$h} \OperatorTok{=} \DecValTok{400}
+\VariableTok{$w} \OperatorTok{=} \DecValTok{1200}
+\VariableTok{$h} \OperatorTok{=} \DecValTok{600}
 
 \NormalTok{set }\WarningTok{width:} \VariableTok{$w}
 \NormalTok{set }\WarningTok{height:} \VariableTok{$h}
-\NormalTok{set }\WarningTok{title:} \VerbatimStringTok{\textquotesingle{}Simulación 10 {-} Dinámica diferencial\textquotesingle{}}
+\NormalTok{set }\WarningTok{title:} \VerbatimStringTok{\textquotesingle{}HH {-} Dinámica de Hodkin{-}Huxley\textquotesingle{}}
 
-\VariableTok{$t0} \OperatorTok{=} \OperatorTok{{-}}\DecValTok{3}
-\VariableTok{$c} \OperatorTok{=} \DecValTok{1}
-\VariableTok{$t1} \OperatorTok{=} \VariableTok{$t0} \OperatorTok{+} \VariableTok{$c}
+\DataTypeTok{Cm} \OperatorTok{=} \DecValTok{1}\NormalTok{; }
+\DataTypeTok{ENa} \OperatorTok{=} \DecValTok{115}\NormalTok{; gNa }\OperatorTok{=} \DecValTok{120}\NormalTok{;}
+\ConstantTok{EK} \OperatorTok{=} \OperatorTok{{-}}\DecValTok{12}\NormalTok{; gK }\OperatorTok{=} \DecValTok{36}\NormalTok{;}
+\ConstantTok{EL} \OperatorTok{=} \FloatTok{10.6}\NormalTok{; gL }\OperatorTok{=} \FloatTok{0.3}\NormalTok{;}
 
-\ControlFlowTok{def}\NormalTok{ impulso(t)}
-\NormalTok{  (t }\OperatorTok{\textgreater{}=} \VariableTok{$t0} \OperatorTok{\&\&}\NormalTok{ t }\OperatorTok{\textless{}=} \VariableTok{$t1}\NormalTok{) }\OperatorTok{?} \FloatTok{1.0} \OperatorTok{:} \FloatTok{0.0}
+\NormalTok{an }\OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(u) }\OperatorTok{\{}\NormalTok{ (}\FloatTok{0.1} \OperatorTok{{-}} \FloatTok{0.01} \OperatorTok{*}\NormalTok{ u) }\OperatorTok{/}\NormalTok{ (}\DataTypeTok{Math}\AttributeTok{.exp}\NormalTok{(}\DecValTok{1} \OperatorTok{{-}} \FloatTok{0.1} \OperatorTok{*}\NormalTok{ u) }\OperatorTok{{-}} \DecValTok{1}\NormalTok{) }\OperatorTok{\}}
+\NormalTok{am }\OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(u) }\OperatorTok{\{}\NormalTok{ (}\FloatTok{2.5} \OperatorTok{{-}} \FloatTok{0.1} \OperatorTok{*}\NormalTok{ u) }\OperatorTok{/}\NormalTok{ (}\DataTypeTok{Math}\AttributeTok{.exp}\NormalTok{(}\FloatTok{2.5} \OperatorTok{{-}} \FloatTok{0.1} \OperatorTok{*}\NormalTok{ u) }\OperatorTok{{-}} \DecValTok{1}\NormalTok{) }\OperatorTok{\}}
+\NormalTok{ah }\OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(u) }\OperatorTok{\{} \FloatTok{0.07} \OperatorTok{*} \DataTypeTok{Math}\AttributeTok{.exp}\NormalTok{(}\OperatorTok{{-}}\NormalTok{u }\OperatorTok{/} \DecValTok{20}\NormalTok{) }\OperatorTok{\}}
+
+\NormalTok{bn }\OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(u) }\OperatorTok{\{} \FloatTok{0.125} \OperatorTok{*} \DataTypeTok{Math}\AttributeTok{.exp}\NormalTok{(}\OperatorTok{{-}}\NormalTok{u }\OperatorTok{/} \DecValTok{80}\NormalTok{) }\OperatorTok{\}}
+\NormalTok{bm }\OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(u) }\OperatorTok{\{} \DecValTok{4} \OperatorTok{*} \DataTypeTok{Math}\AttributeTok{.exp}\NormalTok{(}\OperatorTok{{-}}\NormalTok{u }\OperatorTok{/} \DecValTok{18}\NormalTok{) }\OperatorTok{\}}
+\NormalTok{bh }\OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(u) }\OperatorTok{\{} \DecValTok{1} \OperatorTok{/}\NormalTok{ (}\DataTypeTok{Math}\AttributeTok{.exp}\NormalTok{(}\DecValTok{3} \OperatorTok{{-}} \FloatTok{0.1} \OperatorTok{*}\NormalTok{ u) }\OperatorTok{+} \DecValTok{1}\NormalTok{) }\OperatorTok{\}}
+
+\VariableTok{$dI2} \OperatorTok{=} \FloatTok{0.5}   \CommentTok{\# 0..6 (0.1)}
+\VariableTok{$a} \OperatorTok{=} \DecValTok{0}     \CommentTok{\# 0..15 (1)}
+\VariableTok{$I2} \OperatorTok{=} \FloatTok{0.5}  \CommentTok{\# 0..8 (0.1)}
+
+\DataTypeTok{Unit} \OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(t) }\OperatorTok{\{}\NormalTok{ (t }\OperatorTok{\textgreater{}=} \DecValTok{0}\NormalTok{) }\OperatorTok{?} \FloatTok{1.0} \OperatorTok{:} \FloatTok{0.0} \OperatorTok{\}}
+
+\ConstantTok{J} \OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(t) }\OperatorTok{\{} \VariableTok{$I2} \OperatorTok{+} \VariableTok{$dI2} \OperatorTok{*} \DataTypeTok{Unit}\AttributeTok{.call}\NormalTok{(t }\OperatorTok{{-}} \VariableTok{$a}\NormalTok{) }\OperatorTok{\}}
+
+\DataTypeTok{Du} \OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(t, u, m, n, h) }\OperatorTok{\{}\NormalTok{ (}\OperatorTok{{-}}\NormalTok{gNa }\OperatorTok{*}\NormalTok{ m }\OperatorTok{**} \DecValTok{3} \OperatorTok{*}\NormalTok{ h }\OperatorTok{*}\NormalTok{ (u }\OperatorTok{{-}} \DataTypeTok{ENa}\NormalTok{) }\OperatorTok{{-}}\NormalTok{ gK }\OperatorTok{*}\NormalTok{ n }\OperatorTok{**} \DecValTok{4} \OperatorTok{*}\NormalTok{ (u }\OperatorTok{{-}} \ConstantTok{EK}\NormalTok{) }\OperatorTok{{-}}\NormalTok{ gL }\OperatorTok{*}\NormalTok{ (u }\OperatorTok{{-}} \ConstantTok{EL}\NormalTok{) }\OperatorTok{+} \ConstantTok{J}\AttributeTok{.call}\NormalTok{(t)) }\OperatorTok{/} \DataTypeTok{Cm} \OperatorTok{\}}
+\DataTypeTok{Dn} \OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(t, u, m, n, h) }\OperatorTok{\{}\NormalTok{ an}\AttributeTok{.call}\NormalTok{(u) }\OperatorTok{*}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ n) }\OperatorTok{{-}}\NormalTok{ bn}\AttributeTok{.call}\NormalTok{(u) }\OperatorTok{*}\NormalTok{ n }\OperatorTok{\}}
+\DataTypeTok{Dm} \OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(t, u, m, n, h) }\OperatorTok{\{}\NormalTok{ am}\AttributeTok{.call}\NormalTok{(u) }\OperatorTok{*}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ m) }\OperatorTok{{-}}\NormalTok{ bm}\AttributeTok{.call}\NormalTok{(u) }\OperatorTok{*}\NormalTok{ m }\OperatorTok{\}}
+\DataTypeTok{Dh} \OperatorTok{=} \OperatorTok{{-}\textgreater{}}\NormalTok{(t, u, m, n, h) }\OperatorTok{\{}\NormalTok{ ah}\AttributeTok{.call}\NormalTok{(u) }\OperatorTok{*}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ h) }\OperatorTok{{-}}\NormalTok{ bh}\AttributeTok{.call}\NormalTok{(u) }\OperatorTok{*}\NormalTok{ h }\OperatorTok{\}}
+
+\VariableTok{$tmin} \OperatorTok{=} \OperatorTok{{-}}\DecValTok{10}
+\VariableTok{$tmax} \OperatorTok{=} \DecValTok{100}
+
+\VariableTok{$ymin} \OperatorTok{=} \OperatorTok{{-}}\DecValTok{30}
+\VariableTok{$ymax} \OperatorTok{=} \DecValTok{80}
+
+\ControlFlowTok{def}\NormalTok{ solver(t)}
+
+\NormalTok{    t0 }\OperatorTok{=} \VariableTok{$tmin}
+\NormalTok{    dt }\OperatorTok{=} \FloatTok{0.01}
+
+\NormalTok{    st }\OperatorTok{=}\NormalTok{ t0}
+
+\NormalTok{    u }\OperatorTok{=} \FloatTok{0.0}
+\NormalTok{    m }\OperatorTok{=} \FloatTok{0.0}
+\NormalTok{    n }\OperatorTok{=} \FloatTok{0.0}
+\NormalTok{    h }\OperatorTok{=} \FloatTok{0.0}
+
+    \ControlFlowTok{while}\NormalTok{ st }\OperatorTok{\textless{}}\NormalTok{ t}
+\NormalTok{        du\_val }\OperatorTok{=} \DataTypeTok{Du}\AttributeTok{.call}\NormalTok{(st, u, m, n, h)}
+\NormalTok{        dn\_val }\OperatorTok{=} \DataTypeTok{Dn}\AttributeTok{.call}\NormalTok{(st, u, m, n, h)}
+\NormalTok{        dm\_val }\OperatorTok{=} \DataTypeTok{Dm}\AttributeTok{.call}\NormalTok{(st, u, m, n, h)}
+\NormalTok{        dh\_val }\OperatorTok{=} \DataTypeTok{Dh}\AttributeTok{.call}\NormalTok{(st, u, m, n, h)}
+
+\NormalTok{        u }\OperatorTok{+=}\NormalTok{ dt }\OperatorTok{*}\NormalTok{ du\_val}
+\NormalTok{        n }\OperatorTok{+=}\NormalTok{ dt }\OperatorTok{*}\NormalTok{ dn\_val}
+\NormalTok{        m }\OperatorTok{+=}\NormalTok{ dt }\OperatorTok{*}\NormalTok{ dm\_val}
+\NormalTok{        h }\OperatorTok{+=}\NormalTok{ dt }\OperatorTok{*}\NormalTok{ dh\_val}
+
+\NormalTok{        st }\OperatorTok{+=}\NormalTok{ dt}
+    \ControlFlowTok{end}
+
+    \CommentTok{\#print("\#\{st\} \#\{u\} ")}
+
+\NormalTok{    u}
+
 \ControlFlowTok{end}
 
 \NormalTok{curve1 }\OperatorTok{=} \DataTypeTok{CurveBox}\AttributeTok{.new}\NormalTok{(}
   \WarningTok{ox:} \DecValTok{10}\NormalTok{,}
   \WarningTok{oy:} \DecValTok{10}\NormalTok{,}
-  \WarningTok{sx:} \DecValTok{380}\NormalTok{,}
+  \WarningTok{sx:} \DecValTok{780}\NormalTok{,}
   \WarningTok{sy:} \DecValTok{380}\NormalTok{,}
-  \WarningTok{tmin:} \OperatorTok{{-}}\DecValTok{3}\NormalTok{,}
-  \WarningTok{tmax:} \DecValTok{3}\NormalTok{,}
-  \WarningTok{ymin:} \OperatorTok{{-}}\FloatTok{1.5}\NormalTok{,}
-  \WarningTok{ymax:} \FloatTok{1.5}\NormalTok{,}
-  \WarningTok{f:}\NormalTok{ method(}\WarningTok{:impulso}\NormalTok{)}
+  \WarningTok{tmin:} \VariableTok{$tmin}\NormalTok{,}
+  \WarningTok{tmax:} \VariableTok{$tmax}\NormalTok{,}
+  \WarningTok{ymin:} \VariableTok{$ymin}\NormalTok{,}
+  \WarningTok{ymax:} \VariableTok{$ymax}\NormalTok{,}
+  \WarningTok{f:}\NormalTok{ method(}\WarningTok{:solver}\NormalTok{)}
 \NormalTok{)}
 
-\CommentTok{\# dv/dt = {-}a v + b * impulso(t)}
-\CommentTok{\# v(t + λt) = v(t) + λt * ({-}a v(t) + b * impulso(t))}
-
-
-\VariableTok{$v} \OperatorTok{=} \FloatTok{0.0}   \CommentTok{\# Estado inicial}
-\VariableTok{$a} \OperatorTok{=} \FloatTok{1.0}   \CommentTok{\# Decaimiento}
-\VariableTok{$b} \OperatorTok{=} \FloatTok{2.0}   \CommentTok{\# Peso del impulso}
-\VariableTok{$dt} \OperatorTok{=} \FloatTok{0.05} \CommentTok{\# Paso temporal}
-
-\ControlFlowTok{def}\NormalTok{ dinamica(t)}
-  \VariableTok{$v} \OperatorTok{+=} \VariableTok{$dt} \OperatorTok{*}\NormalTok{ (}\OperatorTok{{-}}\VariableTok{$a} \OperatorTok{*} \VariableTok{$v} \OperatorTok{+} \VariableTok{$b} \OperatorTok{*}\NormalTok{ impulso(t))}
-  \VariableTok{$v}
-\ControlFlowTok{end}
-
 \NormalTok{curve2 }\OperatorTok{=} \DataTypeTok{CurveBox}\AttributeTok{.new}\NormalTok{(}
-  \WarningTok{ox:} \DecValTok{410}\NormalTok{,}
+  \WarningTok{ox:} \DecValTok{10}\NormalTok{,}
+  \WarningTok{oy:} \DecValTok{410}\NormalTok{,}
+  \WarningTok{sx:} \DecValTok{780}\NormalTok{,}
+  \WarningTok{sy:} \DecValTok{180}\NormalTok{,}
+  \WarningTok{tmin:} \VariableTok{$tmin}\NormalTok{,}
+  \WarningTok{tmax:} \VariableTok{$tmax}\NormalTok{,}
+  \WarningTok{ymin:} \OperatorTok{{-}}\FloatTok{0.5}\NormalTok{,}
+  \WarningTok{ymax:} \FloatTok{1.5}\NormalTok{,}
+  \WarningTok{f:} \ConstantTok{J}
+\NormalTok{)}
+
+\VariableTok{$points} \OperatorTok{=} \KeywordTok{[]}
+
+\CommentTok{\# $points \textless{}\textless{} [4, 4]}
+
+\NormalTok{curve3 }\OperatorTok{=} \DataTypeTok{PointBox}\AttributeTok{.new}\NormalTok{(}
+  \WarningTok{ox:} \DecValTok{810}\NormalTok{,}
   \WarningTok{oy:} \DecValTok{10}\NormalTok{,}
   \WarningTok{sx:} \DecValTok{380}\NormalTok{,}
-  \WarningTok{sy:} \DecValTok{380}\NormalTok{,}
-  \WarningTok{tmin:} \OperatorTok{{-}}\DecValTok{3}\NormalTok{,}
-  \WarningTok{tmax:} \DecValTok{3}\NormalTok{,}
-  \WarningTok{ymin:} \OperatorTok{{-}}\FloatTok{1.5}\NormalTok{,}
-  \WarningTok{ymax:} \FloatTok{1.5}\NormalTok{,}
-  \WarningTok{f:}\NormalTok{ method(}\WarningTok{:dinamica}\NormalTok{)}
+  \WarningTok{sy:} \DecValTok{580}\NormalTok{,}
+  \WarningTok{tmin:} \DecValTok{0}\NormalTok{,}
+  \WarningTok{tmax:} \DecValTok{8}\NormalTok{,}
+  \WarningTok{ymin:} \DecValTok{0}\NormalTok{,}
+  \WarningTok{ymax:} \DecValTok{6}\NormalTok{,}
+  \WarningTok{p:} \VariableTok{$points}
 \NormalTok{)}
 
 \NormalTok{curve1}\AttributeTok{.draw}
 \NormalTok{curve2}\AttributeTok{.draw}
+\NormalTok{curve3}\AttributeTok{.draw}
 
-\NormalTok{update }\ControlFlowTok{do}
-  \VariableTok{$t0} \OperatorTok{+=} \FloatTok{0.01}
-  \VariableTok{$t1} \OperatorTok{=} \VariableTok{$t0} \OperatorTok{+} \VariableTok{$c}
+\NormalTok{on }\WarningTok{:mouse\_down} \ControlFlowTok{do} \OperatorTok{|}\NormalTok{event}\OperatorTok{|}
+  \ControlFlowTok{if}\NormalTok{ event}\AttributeTok{.x} \OperatorTok{\textgreater{}=} \DecValTok{810} \OperatorTok{\&\&}\NormalTok{ event}\AttributeTok{.x} \OperatorTok{\textless{}=} \DecValTok{1180} \OperatorTok{\&\&}\NormalTok{ event}\AttributeTok{.y} \OperatorTok{\textgreater{}=} \DecValTok{10} \OperatorTok{\&\&}\NormalTok{ event}\AttributeTok{.y} \OperatorTok{\textless{}=} \DecValTok{580}
+    \CommentTok{\# print("(\#\{event.x\}, \#\{event.y\}) ")}
+\NormalTok{    xr }\OperatorTok{=}\NormalTok{ (event}\AttributeTok{.x} \OperatorTok{{-}} \FloatTok{810.0}\NormalTok{) }\OperatorTok{/}\NormalTok{ (}\FloatTok{1180.0} \OperatorTok{{-}} \FloatTok{810.0}\NormalTok{)}
+\NormalTok{    yr }\OperatorTok{=} \DecValTok{1} \OperatorTok{{-}}\NormalTok{ (event}\AttributeTok{.y} \OperatorTok{{-}} \FloatTok{10.0}\NormalTok{) }\OperatorTok{/}\NormalTok{ (}\FloatTok{580.0} \OperatorTok{{-}} \FloatTok{10.0}\NormalTok{)}
 
-  \ControlFlowTok{if} \VariableTok{$t0} \OperatorTok{\textgreater{}} \DecValTok{3}
-    \VariableTok{$t0} \OperatorTok{=} \OperatorTok{{-}}\DecValTok{3}
-  \ControlFlowTok{end}
+\NormalTok{    x }\OperatorTok{=}\NormalTok{ xr }\OperatorTok{*} \DecValTok{8}
+\NormalTok{    y }\OperatorTok{=}\NormalTok{ yr }\OperatorTok{*} \DecValTok{6}
 
-\NormalTok{  curve1}\AttributeTok{.draw}
-\NormalTok{  curve2}\AttributeTok{.draw}
+\NormalTok{    (}\DecValTok{1}\OperatorTok{..}\DecValTok{10}\NormalTok{)}\AttributeTok{.step}\NormalTok{(}\DecValTok{1}\NormalTok{) }\ControlFlowTok{do} \OperatorTok{|}\NormalTok{i}\OperatorTok{|}
+
+      \VariableTok{$I2} \OperatorTok{=}\NormalTok{ x }\OperatorTok{+} \FunctionTok{rand} \OperatorTok{*} \DecValTok{2} \OperatorTok{{-}} \DecValTok{1}
+      \VariableTok{$dI2} \OperatorTok{=}\NormalTok{ y }\OperatorTok{+} \FunctionTok{rand} \OperatorTok{*} \DecValTok{2} \OperatorTok{{-}} \DecValTok{1}
+
+\NormalTok{      c }\OperatorTok{=} \DecValTok{0}
+
+\NormalTok{      delta }\OperatorTok{=}\NormalTok{ (}\VariableTok{$tmax} \OperatorTok{{-}} \VariableTok{$tmin}\NormalTok{) }\OperatorTok{/} \FloatTok{100.0}
+
+\NormalTok{      (}\VariableTok{$tmin}\OperatorTok{...}\VariableTok{$tmax}\NormalTok{)}\AttributeTok{.step}\NormalTok{(delta) }\ControlFlowTok{do} \OperatorTok{|}\NormalTok{t}\OperatorTok{|}
+\NormalTok{        c }\OperatorTok{+=}\NormalTok{ solver(t)}
+      \ControlFlowTok{end}
+
+      \VariableTok{$points} \OperatorTok{\textless{}\textless{}} \KeywordTok{[}\VariableTok{$I2}\NormalTok{, }\VariableTok{$dI2}\NormalTok{, (c }\OperatorTok{{-}} \FloatTok{100.0}\NormalTok{) }\OperatorTok{/} \FloatTok{1000.0}\KeywordTok{]}
+
+    \ControlFlowTok{end}
+
+    \VariableTok{$I2} \OperatorTok{=}\NormalTok{ x}
+    \VariableTok{$dI2} \OperatorTok{=}\NormalTok{ y}
+
+\NormalTok{    c }\OperatorTok{=} \DecValTok{0}
+
+\NormalTok{    delta }\OperatorTok{=}\NormalTok{ (}\VariableTok{$tmax} \OperatorTok{{-}} \VariableTok{$tmin}\NormalTok{) }\OperatorTok{/} \FloatTok{100.0}
+
+\NormalTok{    (}\VariableTok{$tmin}\OperatorTok{...}\VariableTok{$tmax}\NormalTok{)}\AttributeTok{.step}\NormalTok{(delta) }\ControlFlowTok{do} \OperatorTok{|}\NormalTok{t}\OperatorTok{|}
+\NormalTok{      c }\OperatorTok{+=}\NormalTok{ solver(t)}
+    \ControlFlowTok{end}
+
+    \VariableTok{$points} \OperatorTok{\textless{}\textless{}} \KeywordTok{[}\VariableTok{$I2}\NormalTok{, }\VariableTok{$dI2}\NormalTok{, (c }\OperatorTok{{-}} \FloatTok{100.0}\NormalTok{) }\OperatorTok{/} \FloatTok{1000.0}\KeywordTok{]}
+
+\NormalTok{    curve1}\AttributeTok{.draw}
+
+\NormalTok{    curve3}\AttributeTok{.p} \OperatorTok{=} \VariableTok{$points}
+
+\NormalTok{    curve3}\AttributeTok{.draw}
+  \ControlFlowTok{end} 
 \ControlFlowTok{end}
 
 \NormalTok{show}
