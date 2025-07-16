@@ -10,3 +10,5 @@ presentaciones/
 *.log
 *.out
 *.synctex.gz
+
+~$*
